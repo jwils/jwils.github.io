@@ -1,0 +1,287 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Emailing Google Spreadsheet Grades - Josh Wilson</title>
+	<meta name="author" content="Josh Wilson">
+
+	
+	<meta name="description" content="I am a teaching assistant for a friend this year, and the hassle of how to send out grades has been a small challenge for me. Last year the class was &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Josh Wilson" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://jwils.me/blog/2013/03/14/emailing-google-spreadsheet-grades/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<style type="text/css">
+    /* Apply (proposed) CSS style */
+    .balance-text {
+        text-wrap: balanced;
+    }
+    </style>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+	
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-38067777-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+</head>
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<img src="/images/dp.png" alt="Profile Picture" style="width: 160px;">
+</div>
+<h1><a href="/">Josh Wilson</a></h1>
+<p class="subtitle"></p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/projects">Projects</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<p class="subtitle">I am a senior in computer science at the University of Pennsylvania.</p>
+
+<nav id="sub-nav">
+	<div class="social">
+		
+		
+		<a class="google" href="https://plus.google.com/112250446708992979788?rel=author" title="Google+">Google+</a>
+		
+		
+		<a class="twitter" href="http://twitter.com/j0shwils0n" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/jwils" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+<div id="banner" class="inner">
+	<div class="container">
+		<ul class="feed"></ul>
+	</div>
+	<small><a href="http://twitter.com/j0shwils0n">j0shwils0n</a> @ <a href="http://twitter.com">Twitter</a></small>
+	<div class="loading">Loading...</div>
+</div>
+<script src="/javascripts/twitter.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('#banner').getTwitterFeed('j0shwils0n', 4, false);
+	})(jQuery);
+</script>
+
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post">
+	<h1 class="title">Emailing Google Spreadsheet Grades</h1>
+	<div class="entry-content"><p>I am a teaching assistant for a friend this year, and the hassle of how to send out grades has been a small challenge for me. Last year the class was small enough that I could simply copy and paste from the Google spreadsheets we use to an email. This semester, however, we have more than 25 kids, so I wanted to find a better solution.</p>
+
+<p>At RedSnake Philly one of the presenters talked about what he had done with Google Apps Scripts. I decided to take a look at it to see if I could automate emailing grades from a spreadsheet. It turns out that not only is it possible, but it’s pretty easy to do.  The script to send an email to each student on our list is only about 10 lines long.</p>
+
+<!--more-->
+
+
+
+
+<figure class='code'><figcaption><span>code.gs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">sendEmails</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">sheet</span> <span class="o">=</span> <span class="nx">SpreadsheetApp</span><span class="p">.</span><span class="nx">getActiveSheet</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">startRow</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">numRows</span> <span class="o">=</span> <span class="mi">19</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">numColumns</span> <span class="o">=</span> <span class="mi">25</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">dataRange</span> <span class="o">=</span> <span class="nx">sheet</span><span class="p">.</span><span class="nx">getRange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">numRows</span><span class="p">,</span> <span class="nx">numColumns</span><span class="p">);</span>
+</span><span class='line'>  <span class="c1">// Fetch values for each row in the Range.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">dataRange</span><span class="p">.</span><span class="nx">getValues</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">headerRange</span> <span class="o">=</span> <span class="nx">sheet</span><span class="p">.</span><span class="nx">getRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">numColumns</span><span class="p">);</span> <span class="c1">//The first row tells us what each value means.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">header</span> <span class="o">=</span> <span class="nx">headerRange</span><span class="p">.</span><span class="nx">getValues</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">//Treat it as a single dementional array</span>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">row</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span> <span class="c1">//Row of current users data</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">emailAddress</span> <span class="o">=</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@seas.upenn.edu&quot;</span><span class="p">;</span>  <span class="c1">// add domain to pennkey</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">message</span> <span class="o">=</span> <span class="nx">generateHtmlEmail</span><span class="p">(</span><span class="nx">header</span><span class="p">,</span> <span class="nx">row</span><span class="p">);</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">subject</span> <span class="o">=</span> <span class="nx">ScriptProperties</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s2">&quot;EmailSubject&quot;</span><span class="p">);;</span> <span class="c1">//This should be changed for each assignment.</span>
+</span><span class='line'>    <span class="nx">MailApp</span><span class="p">.</span><span class="nx">sendEmail</span><span class="p">(</span><span class="nx">emailAddress</span><span class="p">,</span> <span class="nx">subject</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span>
+</span><span class='line'>                      <span class="p">{</span><span class="nx">htmlBody</span><span class="o">:</span> <span class="nx">message</span><span class="p">,</span>
+</span><span class='line'>                       <span class="nx">cc</span><span class="o">:</span> <span class="s2">&quot;teacherAndOtherTAs&quot;</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The generate email function is a little more exciting. It uses a google doc as a template, and fills in the grade by replacing the header template in the doc.</p>
+
+<figure class='code'><figcaption><span>code.gs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">getHtmlEmail</span><span class="p">(</span><span class="nx">header</span><span class="p">,</span> <span class="nx">row</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">templateDocId</span> <span class="o">=</span> <span class="nx">ScriptProperties</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s2">&quot;TemplateID&quot;</span><span class="p">);</span> <span class="c1">//Look up template id.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">docId</span> <span class="o">=</span> <span class="nx">DocsList</span><span class="p">.</span><span class="nx">getFileById</span><span class="p">(</span><span class="nx">templateDocId</span><span class="p">).</span><span class="nx">makeCopy</span><span class="p">().</span><span class="nx">getId</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">DocumentApp</span><span class="p">.</span><span class="nx">openById</span><span class="p">(</span><span class="nx">docId</span><span class="p">);</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">body</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">getActiveSection</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span> <span class="kd">var</span> <span class="nx">h</span> <span class="k">in</span> <span class="nx">header</span> <span class="p">){</span>
+</span><span class='line'>    <span class="nx">body</span><span class="p">.</span><span class="nx">replaceText</span><span class="p">(</span><span class="s2">&quot;%&quot;</span> <span class="o">+</span> <span class="nx">header</span><span class="p">[</span><span class="nx">h</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="nx">h</span><span class="p">]);</span> <span class="c1">//Replace template code with the current students grades.</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">doc</span><span class="p">.</span><span class="nx">saveAndClose</span><span class="p">();</span>
+</span><span class='line'>  <span class="nx">html</span> <span class="o">=</span> <span class="nx">getDocAsHtml</span><span class="p">(</span><span class="nx">docId</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">DocsList</span><span class="p">.</span><span class="nx">getFileById</span><span class="p">(</span><span class="nx">docId</span><span class="p">).</span><span class="nx">setTrashed</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> <span class="c1">//throw the doc away since we no longer need it.</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">html</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First we copy the document. We can then replace each variable that corresponds to a row header and return the html to send as an email.</p>
+
+<p>This easily sends emails to everyone in the class. However, I still have a bit of work. Regrades require individual messages. I want to add some sort of flag that only resends messages to users when their grades changes.</p>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2015 - Josh Wilson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'cs-ramblings';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jwils.me/blog/2013/03/14/emailing-google-spreadsheet-grades/';
+        var disqus_url = 'http://jwils.me/blog/2013/03/14/emailing-google-spreadsheet-grades/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-38067777-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

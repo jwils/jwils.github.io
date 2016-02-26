@@ -1,0 +1,213 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Senior Thesis - Josh Wilson</title>
+	<meta name="author" content="Josh Wilson">
+
+	
+	<meta name="description" content="For our senior thesis, my team is working determining the readability of colored text. My job has been to create the web app that is used to store &hellip;">
+	
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="Josh Wilson" type="application/atom+xml">
+	
+	<link rel="canonical" href="http://jwils.me/blog/2013/02/03/senior-design/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,700' rel='stylesheet' type='text/css'>
+	<style type="text/css">
+    /* Apply (proposed) CSS style */
+    .balance-text {
+        text-wrap: balanced;
+    }
+    </style>
+	<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+	
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-38067777-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+</head>
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<div class="intrude-less">
+			<header id="header" class="inner"><div class="profilepic">	
+	<img src="/images/dp.png" alt="Profile Picture" style="width: 160px;">
+</div>
+<h1><a href="/">Josh Wilson</a></h1>
+<p class="subtitle"></p>
+<nav id="main-nav"><ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/projects">Projects</a></li>
+  <li><a href="/about">About</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+</nav>
+<p class="subtitle">I am a senior in computer science at the University of Pennsylvania.</p>
+
+<nav id="sub-nav">
+	<div class="social">
+		
+		
+		<a class="google" href="https://plus.google.com/112250446708992979788?rel=author" title="Google+">Google+</a>
+		
+		
+		<a class="twitter" href="http://twitter.com/j0shwils0n" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/jwils" title="GitHub">GitHub</a>
+		
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+</header>				
+			</div>
+		</div>	
+		<div class="mid-col">
+			
+				
+<div id="banner" class="inner">
+	<div class="container">
+		<ul class="feed"></ul>
+	</div>
+	<small><a href="http://twitter.com/j0shwils0n">j0shwils0n</a> @ <a href="http://twitter.com">Twitter</a></small>
+	<div class="loading">Loading...</div>
+</div>
+<script src="/javascripts/twitter.js"></script>
+<script type="text/javascript">
+	(function($){
+		$('#banner').getTwitterFeed('j0shwils0n', 4, false);
+	})(jQuery);
+</script>
+
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post">
+	<h1 class="title">Senior Thesis</h1>
+	<div class="entry-content"><p>For our senior thesis, my team is working determining the readability of colored text. My job has been to create the web app that is used to store our images, collect results from users, and organize the results so that they can be analyzed by our tools written in MATLAB, and later by Weka (a machine learning tool).</p>
+
+<p>The webapp is written in Rails and is integrated in many components of our workflow.</p>
+
+<!--more-->
+
+
+<h2>The workflow:</h2>
+
+<ul>
+<li><p>Jordan generates images using the python Image class. These images are generated uniformly at random across the RGB color space (Defines a color by the amount of red, green and blue).</p></li>
+<li><p>I take the image and upload them to our web app. Our database stores the images, as well as the corresponding foreground and background colors.</p></li>
+<li><p>I then divide them into groups of 8 images and create an experiment. An experiment contains 8 images and three signpost images. I will attempt to discuss the sign posts in more detail in a future post, but they are used to help calibrate our results across experiments.</p></li>
+<li><p>Using the gem Turkee, I can launch these experiments in groups to Mechanical Turk. We pay users get 3-5 cents for each survey they complete.</p></li>
+<li><p>As results come in, we download these results, and generate a CSV file of all comparisons. Ayaka feeds these comparisons into a MATLAB implementation of an model called MLSD. This converts our binary comparisons to a linear scale where each image is given a single value representing its location on a line. I will try to go into more detail on this in a future post.</p></li>
+<li><p>We can then feed these values back into the database, giving us a single value for each image. From here we generate an Attribute-Relation File (ARFF) that we can feed into Weka. Our goal here is to generate a model that can accurately predict the readability value we previously assigned.</p></li>
+</ul>
+
+
+<p>It has taken a while to get all our pipeline components working the way we want, but now that everything is well tested we should begin launching a large number of experiments in the near future and have results soon after that.</p>
+</div>
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+			</div>
+			<footer id="footer" class="inner"><p>
+  Copyright &copy; 2015 - Josh Wilson -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+Design credit: <a href="http://shashankmehta.in/archive/2012/greyshade.html">Shashank Mehta</a></footer>
+			<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'cs-ramblings';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://jwils.me/blog/2013/02/03/senior-design/';
+        var disqus_url = 'http://jwils.me/blog/2013/02/03/senior-design/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-38067777-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+
+		</div>
+	</div>
+</body>
+</html>

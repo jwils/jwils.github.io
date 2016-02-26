@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: rails | Josh Wilson]]></title>
+  <link href="http://jwils.me/blog/categories/rails/atom.xml" rel="self"/>
+  <link href="http://jwils.me/"/>
+  <updated>2015-07-17T12:53:18-07:00</updated>
+  <id>http://jwils.me/</id>
+  <author>
+    <name><![CDATA[Josh Wilson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Displaying a S3 Bucket as Nested Directories in Rails]]></title>
+    <link href="http://jwils.me/blog/2013/01/02/displaying-s3-bucket-as-nested-directories-in-rails/"/>
+    <updated>2013-01-02T17:47:00-08:00</updated>
+    <id>http://jwils.me/blog/2013/01/02/displaying-s3-bucket-as-nested-directories-in-rails</id>
+    <content type="html"><![CDATA[<p>The component of the app I am currently working on for WCAI, researchers need to be able to download data files. Many of these files are more than a gigabyte in length. After deciding to store the files on S3, it was important to create a secure and easy to use interface to access and download these files.</p>
+
+<!--more-->
+
+
+<p>Here is the files model I created to treat files stored on aws the same as things stored in the database.</p>
+
+<p>``` ruby models/project_file.rb /code/project_file.rb Download
+class ProjectFile
+  attr_accessor :children, :size, :path</p>
+
+<p>  EXT_MAP =  {</p>
+
+<pre><code>  'xls'  =&gt; :xls,
+  'xlsx' =&gt; :xls,
+  'doc'  =&gt; :doc,
+  'docx' =&gt; :doc,
+  'zip'  =&gt; :zip,
+  'txt'  =&gt; :txt,
+  'pdf'  =&gt; :pdf,
+  'sql'  =&gt; :sql,
+</code></pre>
+
+<p>  }</p>
+
+<p>  def self.find_by_project_name(name)</p>
+
+<pre><code>project_files = self.files.all({:prefix =&gt; name})
+output_files = Hash.new
+file_lookup = Hash.new 
+root = nil
+
+project_files.each do |project_file|
+  file_lookup[project_file.key] = convert(project_file)
+end
+
+ file_lookup.values.each do |project_file|
+  if project_file.parent_name.nil?
+    root = project_file
+  else
+    parent = file_lookup[project_file.parent_name]
+    parent.children ||= []
+    parent.children  &lt;&lt; project_file
+  end
+ end
+return root
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.find_link_by_name(name)</p>
+
+<pre><code>fog_file = self.files.get(name)
+expiration = Time.now + 60.seconds
+fog_file.url(expiration)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.convert(fog_file)</p>
+
+<pre><code>file = ProjectFile.new
+file.size = fog_file.content_length
+file.path = fog_file.key
+file.children = nil
+return file
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.files</p>
+
+<pre><code>FOG_STORAGE.directories.get(Settings.aws_bucket).files
+</code></pre>
+
+<p>  end</p>
+
+<p>  def extension</p>
+
+<pre><code>ext = self.path[path.rindex(/\./) + 1..-1]
+EXT_MAP[ext]
+</code></pre>
+
+<p>  end</p>
+
+<p>  def extension_css</p>
+
+<pre><code>unless extension.nil?
+  extension.to_s
+else
+  "default"
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def file_name</p>
+
+<pre><code>parent_index = path.rindex(/\//,-2)
+if parent_index.nil?
+  path
+else
+  path[parent_index +1..-1]
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def parent_name</p>
+
+<pre><code>parent_index = path.rindex(/\//,-2)
+if parent_index.nil?
+  nil
+else
+  path[0..parent_index]
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def is_directory?</p>
+
+<pre><code>not children.nil?
+</code></pre>
+
+<p>  end</p>
+
+<p>  def str_size</p>
+
+<pre><code>  if size &gt; 1024 * 1024 * 1024
+    "%0.0f GB" % (size / (1024 * 1024 * 1024))
+  elsif size &gt; 1024 * 1024
+    "%0.0f MB" % (size / (1024 * 1024 ))
+  else
+    "%0.0f KB" % (size / 1024)
+  end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Files are displayed to uses using a tutorial on <a href="http://homework.nwsnet.de/releases/ea21/">collapse tree for file structures</a>. A simple helper function converts the data structure to the proper nested list explained in this example.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Beginning the Project]]></title>
+    <link href="http://jwils.me/blog/2012/11/02/beginning-the-project/"/>
+    <updated>2012-11-02T15:12:00-07:00</updated>
+    <id>http://jwils.me/blog/2012/11/02/beginning-the-project</id>
+    <content type="html"><![CDATA[<p>Many great web frameworks exist; for this project I chose Ruby on Rails. Since the framework is so popular, gems (extensions) exist that will greatly simplify much of the process. Rails also has a great support community available to help when I run into trouble.</p>
+
+<!--more-->
+
+
+<p>A few examples of great gems are:
+devise cancan, and rolify - Together these gems provide a very powerful and robust way of managing users and permissions. The app has three permission levels researchers, researcher assistants, and admins. Each of these groups will have certain rights and retrictions which are easily managed through these gems.</p>
+
+<p>fog - used to interact with amazon web services through ruby code. Fog can manage amazon instances and files though simple ruby functions.</p>
+
+<p>twitter-bootstrap-rails and simple-form-for - automatically makes forms with bootstrap components, greatly improving design with minimal additional coding.</p>
+
+<h2>Personal Goals</h2>
+
+<p>Setting personal goals outside the simple scope of the project is important to me. I am still learning, and a good way to keep learning is to focus on things that I need to improve while working on a project.</p>
+
+<p>I have a few goals for this project, but most importantly I want to focus on testing. Testing is extremely useful, both for making sure code does what is expected, and ensuring that code wont be broken in the future.</p>
+
+<p>Unfortunately I often overlook testing though. It is often hard to see the time that it saves since it doesn't directly convert to progress on the site. However, it saves a lot of time by catching errors before they are published. It also is often easier to design a function when you can test in as you build.</p>
+]]></content>
+  </entry>
+  
+</feed>

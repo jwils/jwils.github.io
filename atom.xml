@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Josh Wilson]]></title>
+  <link href="http://jwils.me/atom.xml" rel="self"/>
+  <link href="http://jwils.me/"/>
+  <updated>2015-07-17T12:53:18-07:00</updated>
+  <id>http://jwils.me/</id>
+  <author>
+    <name><![CDATA[Josh Wilson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Emailing Google Spreadsheet Grades]]></title>
+    <link href="http://jwils.me/blog/2013/03/14/emailing-google-spreadsheet-grades/"/>
+    <updated>2013-03-14T09:37:00-07:00</updated>
+    <id>http://jwils.me/blog/2013/03/14/emailing-google-spreadsheet-grades</id>
+    <content type="html"><![CDATA[<p>I am a teaching assistant for a friend this year, and the hassle of how to send out grades has been a small challenge for me. Last year the class was small enough that I could simply copy and paste from the Google spreadsheets we use to an email. This semester, however, we have more than 25 kids, so I wanted to find a better solution.</p>
+
+<p>At RedSnake Philly one of the presenters talked about what he had done with Google Apps Scripts. I decided to take a look at it to see if I could automate emailing grades from a spreadsheet. It turns out that not only is it possible, but it’s pretty easy to do.  The script to send an email to each student on our list is only about 10 lines long.</p>
+
+<!--more-->
+
+
+
+
+<figure class='code'><figcaption><span>code.gs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">sendEmails</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">sheet</span> <span class="o">=</span> <span class="nx">SpreadsheetApp</span><span class="p">.</span><span class="nx">getActiveSheet</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">startRow</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">numRows</span> <span class="o">=</span> <span class="mi">19</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">numColumns</span> <span class="o">=</span> <span class="mi">25</span><span class="p">;</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">dataRange</span> <span class="o">=</span> <span class="nx">sheet</span><span class="p">.</span><span class="nx">getRange</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">numRows</span><span class="p">,</span> <span class="nx">numColumns</span><span class="p">);</span>
+</span><span class='line'>  <span class="c1">// Fetch values for each row in the Range.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">dataRange</span><span class="p">.</span><span class="nx">getValues</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">headerRange</span> <span class="o">=</span> <span class="nx">sheet</span><span class="p">.</span><span class="nx">getRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">numColumns</span><span class="p">);</span> <span class="c1">//The first row tells us what each value means.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">header</span> <span class="o">=</span> <span class="nx">headerRange</span><span class="p">.</span><span class="nx">getValues</span><span class="p">()[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">//Treat it as a single dementional array</span>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">row</span> <span class="o">=</span> <span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span> <span class="c1">//Row of current users data</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">emailAddress</span> <span class="o">=</span> <span class="nx">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;@seas.upenn.edu&quot;</span><span class="p">;</span>  <span class="c1">// add domain to pennkey</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">message</span> <span class="o">=</span> <span class="nx">generateHtmlEmail</span><span class="p">(</span><span class="nx">header</span><span class="p">,</span> <span class="nx">row</span><span class="p">);</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">subject</span> <span class="o">=</span> <span class="nx">ScriptProperties</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s2">&quot;EmailSubject&quot;</span><span class="p">);;</span> <span class="c1">//This should be changed for each assignment.</span>
+</span><span class='line'>    <span class="nx">MailApp</span><span class="p">.</span><span class="nx">sendEmail</span><span class="p">(</span><span class="nx">emailAddress</span><span class="p">,</span> <span class="nx">subject</span><span class="p">,</span> <span class="nx">message</span><span class="p">,</span>
+</span><span class='line'>                      <span class="p">{</span><span class="nx">htmlBody</span><span class="o">:</span> <span class="nx">message</span><span class="p">,</span>
+</span><span class='line'>                       <span class="nx">cc</span><span class="o">:</span> <span class="s2">&quot;teacherAndOtherTAs&quot;</span> <span class="p">});</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The generate email function is a little more exciting. It uses a google doc as a template, and fills in the grade by replacing the header template in the doc.</p>
+
+<figure class='code'><figcaption><span>code.gs</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">function</span> <span class="nx">getHtmlEmail</span><span class="p">(</span><span class="nx">header</span><span class="p">,</span> <span class="nx">row</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">templateDocId</span> <span class="o">=</span> <span class="nx">ScriptProperties</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s2">&quot;TemplateID&quot;</span><span class="p">);</span> <span class="c1">//Look up template id.</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">docId</span> <span class="o">=</span> <span class="nx">DocsList</span><span class="p">.</span><span class="nx">getFileById</span><span class="p">(</span><span class="nx">templateDocId</span><span class="p">).</span><span class="nx">makeCopy</span><span class="p">().</span><span class="nx">getId</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">doc</span> <span class="o">=</span> <span class="nx">DocumentApp</span><span class="p">.</span><span class="nx">openById</span><span class="p">(</span><span class="nx">docId</span><span class="p">);</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">body</span> <span class="o">=</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">getActiveSection</span><span class="p">();</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">for</span> <span class="p">(</span> <span class="kd">var</span> <span class="nx">h</span> <span class="k">in</span> <span class="nx">header</span> <span class="p">){</span>
+</span><span class='line'>    <span class="nx">body</span><span class="p">.</span><span class="nx">replaceText</span><span class="p">(</span><span class="s2">&quot;%&quot;</span> <span class="o">+</span> <span class="nx">header</span><span class="p">[</span><span class="nx">h</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">,</span> <span class="nx">row</span><span class="p">[</span><span class="nx">h</span><span class="p">]);</span> <span class="c1">//Replace template code with the current students grades.</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nx">doc</span><span class="p">.</span><span class="nx">saveAndClose</span><span class="p">();</span>
+</span><span class='line'>  <span class="nx">html</span> <span class="o">=</span> <span class="nx">getDocAsHtml</span><span class="p">(</span><span class="nx">docId</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">DocsList</span><span class="p">.</span><span class="nx">getFileById</span><span class="p">(</span><span class="nx">docId</span><span class="p">).</span><span class="nx">setTrashed</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span> <span class="c1">//throw the doc away since we no longer need it.</span>
+</span><span class='line'>  <span class="k">return</span> <span class="nx">html</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First we copy the document. We can then replace each variable that corresponds to a row header and return the html to send as an email.</p>
+
+<p>This easily sends emails to everyone in the class. However, I still have a bit of work. Regrades require individual messages. I want to add some sort of flag that only resends messages to users when their grades changes.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Senior Thesis]]></title>
+    <link href="http://jwils.me/blog/2013/02/03/senior-design/"/>
+    <updated>2013-02-03T04:50:00-08:00</updated>
+    <id>http://jwils.me/blog/2013/02/03/senior-design</id>
+    <content type="html"><![CDATA[<p>For our senior thesis, my team is working determining the readability of colored text. My job has been to create the web app that is used to store our images, collect results from users, and organize the results so that they can be analyzed by our tools written in MATLAB, and later by Weka (a machine learning tool).</p>
+
+<p>The webapp is written in Rails and is integrated in many components of our workflow.</p>
+
+<!--more-->
+
+
+<h2>The workflow:</h2>
+
+<ul>
+<li><p>Jordan generates images using the python Image class. These images are generated uniformly at random across the RGB color space (Defines a color by the amount of red, green and blue).</p></li>
+<li><p>I take the image and upload them to our web app. Our database stores the images, as well as the corresponding foreground and background colors.</p></li>
+<li><p>I then divide them into groups of 8 images and create an experiment. An experiment contains 8 images and three signpost images. I will attempt to discuss the sign posts in more detail in a future post, but they are used to help calibrate our results across experiments.</p></li>
+<li><p>Using the gem Turkee, I can launch these experiments in groups to Mechanical Turk. We pay users get 3-5 cents for each survey they complete.</p></li>
+<li><p>As results come in, we download these results, and generate a CSV file of all comparisons. Ayaka feeds these comparisons into a MATLAB implementation of an model called MLSD. This converts our binary comparisons to a linear scale where each image is given a single value representing its location on a line. I will try to go into more detail on this in a future post.</p></li>
+<li><p>We can then feed these values back into the database, giving us a single value for each image. From here we generate an Attribute-Relation File (ARFF) that we can feed into Weka. Our goal here is to generate a model that can accurately predict the readability value we previously assigned.</p></li>
+</ul>
+
+
+<p>It has taken a while to get all our pipeline components working the way we want, but now that everything is well tested we should begin launching a large number of experiments in the near future and have results soon after that.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Error Tolerance]]></title>
+    <link href="http://jwils.me/blog/2013/01/29/error-tolerance/"/>
+    <updated>2013-01-29T06:11:00-08:00</updated>
+    <id>http://jwils.me/blog/2013/01/29/error-tolerance</id>
+    <content type="html"><![CDATA[<p>I can’t count the number of times that I have had trouble with my computer. Often a friend will say something like “Aren’t you a programmer; if you know how computers work, why do you have so much trouble with yours?” This is a very interesting question, for someone who spends every day with computers, my devises are surprisingly more difficult to use than the average computer. For a while restarting my phone would start a bootloader that was extremely difficult to navigate. Right now, starting my desktop requires pressing F12 to launch the boot menu and then navigating to the correctly numbered partition for Windows or Linux. These annoyances would probably drive the average user crazy.</p>
+
+<!--more-->
+
+
+<p>For me these issues take up such a small chunk of my day that they aren’t worth taking the time to fix, especially because there’s a good chance I’ll just want to change it again in the future.</p>
+
+<p>I believe, as a programmer, I have naturally developed an extremely high error tolerance. More than once I have come across a bug for the first time that requires an hour or so research to learn the trivially stupid mistake I made. If I had not been able to develop such a high error tolerance I would have quit computer science years ago.</p>
+
+<p>While in many cases this kind of patience is a great trait, it is important to be aware of the times where it can be detrimental.</p>
+
+<p>I am currently working on designing my first major web application. I just presented it to my boss last week, and he pointed out my biggest mistake. I was applying my error tolerance in the app flow. For example, when a user invited people to join a project, it would redirect the user back to the home screen instead of the project page they came from. Another example is that users can be selected for certain tasks. However I was also displaying users who had not yet filled out their name. Thus many of these choices were blank.</p>
+
+<p>I overlooked these errors that I would probably realize are big mistakes if I spent an extra second thinking about them. Instead I naturally ignore them, since I put up with worse errors everyday.</p>
+
+<p>While error tolerance is sometimes a great trait, with UX design, it is important to forget this skill and not put up with any mistakes.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Displaying a S3 Bucket as Nested Directories in Rails]]></title>
+    <link href="http://jwils.me/blog/2013/01/02/displaying-s3-bucket-as-nested-directories-in-rails/"/>
+    <updated>2013-01-02T17:47:00-08:00</updated>
+    <id>http://jwils.me/blog/2013/01/02/displaying-s3-bucket-as-nested-directories-in-rails</id>
+    <content type="html"><![CDATA[<p>The component of the app I am currently working on for WCAI, researchers need to be able to download data files. Many of these files are more than a gigabyte in length. After deciding to store the files on S3, it was important to create a secure and easy to use interface to access and download these files.</p>
+
+<!--more-->
+
+
+<p>Here is the files model I created to treat files stored on aws the same as things stored in the database.</p>
+
+<figure class='code'><figcaption><span>models/project_file.rb</span><a href='http://jwils.me/code/project_file.rb'>Download</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="k">class</span> <span class="nc">ProjectFile</span>
+</span><span class='line'>  <span class="kp">attr_accessor</span> <span class="ss">:children</span><span class="p">,</span> <span class="ss">:size</span><span class="p">,</span> <span class="ss">:path</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="no">EXT_MAP</span> <span class="o">=</span>  <span class="p">{</span>
+</span><span class='line'>      <span class="s1">&#39;xls&#39;</span>  <span class="o">=&gt;</span> <span class="ss">:xls</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;xlsx&#39;</span> <span class="o">=&gt;</span> <span class="ss">:xls</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;doc&#39;</span>  <span class="o">=&gt;</span> <span class="ss">:doc</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;docx&#39;</span> <span class="o">=&gt;</span> <span class="ss">:doc</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;zip&#39;</span>  <span class="o">=&gt;</span> <span class="ss">:zip</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;txt&#39;</span>  <span class="o">=&gt;</span> <span class="ss">:txt</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;pdf&#39;</span>  <span class="o">=&gt;</span> <span class="ss">:pdf</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;sql&#39;</span>  <span class="o">=&gt;</span> <span class="ss">:sql</span><span class="p">,</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_by_project_name</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">project_files</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">all</span><span class="p">({</span><span class="ss">:prefix</span> <span class="o">=&gt;</span> <span class="nb">name</span><span class="p">})</span>
+</span><span class='line'>    <span class="n">output_files</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="n">file_lookup</span> <span class="o">=</span> <span class="no">Hash</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="n">root</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">project_files</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">project_file</span><span class="o">|</span>
+</span><span class='line'>      <span class="n">file_lookup</span><span class="o">[</span><span class="n">project_file</span><span class="o">.</span><span class="n">key</span><span class="o">]</span> <span class="o">=</span> <span class="n">convert</span><span class="p">(</span><span class="n">project_file</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>     <span class="n">file_lookup</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">project_file</span><span class="o">|</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">project_file</span><span class="o">.</span><span class="n">parent_name</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>        <span class="n">root</span> <span class="o">=</span> <span class="n">project_file</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>        <span class="n">parent</span> <span class="o">=</span> <span class="n">file_lookup</span><span class="o">[</span><span class="n">project_file</span><span class="o">.</span><span class="n">parent_name</span><span class="o">]</span>
+</span><span class='line'>        <span class="n">parent</span><span class="o">.</span><span class="n">children</span> <span class="o">||=</span> <span class="o">[]</span>
+</span><span class='line'>        <span class="n">parent</span><span class="o">.</span><span class="n">children</span>  <span class="o">&lt;&lt;</span> <span class="n">project_file</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>     <span class="k">end</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">root</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">find_link_by_name</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">fog_file</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">name</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">expiration</span> <span class="o">=</span> <span class="no">Time</span><span class="o">.</span><span class="n">now</span> <span class="o">+</span> <span class="mi">60</span><span class="o">.</span><span class="n">seconds</span>
+</span><span class='line'>    <span class="n">fog_file</span><span class="o">.</span><span class="n">url</span><span class="p">(</span><span class="n">expiration</span><span class="p">)</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">convert</span><span class="p">(</span><span class="n">fog_file</span><span class="p">)</span>
+</span><span class='line'>    <span class="n">file</span> <span class="o">=</span> <span class="no">ProjectFile</span><span class="o">.</span><span class="n">new</span>
+</span><span class='line'>    <span class="n">file</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">fog_file</span><span class="o">.</span><span class="n">content_length</span>
+</span><span class='line'>    <span class="n">file</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">fog_file</span><span class="o">.</span><span class="n">key</span>
+</span><span class='line'>    <span class="n">file</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="kp">nil</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">file</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">files</span>
+</span><span class='line'>    <span class="no">FOG_STORAGE</span><span class="o">.</span><span class="n">directories</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="no">Settings</span><span class="o">.</span><span class="n">aws_bucket</span><span class="p">)</span><span class="o">.</span><span class="n">files</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">extension</span>
+</span><span class='line'>    <span class="n">ext</span> <span class="o">=</span> <span class="nb">self</span><span class="o">.</span><span class="n">path</span><span class="o">[</span><span class="n">path</span><span class="o">.</span><span class="n">rindex</span><span class="p">(</span><span class="sr">/\./</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>    <span class="no">EXT_MAP</span><span class="o">[</span><span class="n">ext</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">extension_css</span>
+</span><span class='line'>    <span class="k">unless</span> <span class="n">extension</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>      <span class="n">extension</span><span class="o">.</span><span class="n">to_s</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="s2">&quot;default&quot;</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">file_name</span>
+</span><span class='line'>    <span class="n">parent_index</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">rindex</span><span class="p">(</span><span class="sr">/\//</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">parent_index</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>      <span class="n">path</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="n">path</span><span class="o">[</span><span class="n">parent_index</span> <span class="o">+</span><span class="mi">1</span><span class="o">.</span><span class="n">.</span><span class="o">-</span><span class="mi">1</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">parent_name</span>
+</span><span class='line'>    <span class="n">parent_index</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">rindex</span><span class="p">(</span><span class="sr">/\//</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">parent_index</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>      <span class="kp">nil</span>
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'>      <span class="n">path</span><span class="o">[</span><span class="mi">0</span><span class="o">.</span><span class="n">.parent_index</span><span class="o">]</span>
+</span><span class='line'>    <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">is_directory?</span>
+</span><span class='line'>    <span class="ow">not</span> <span class="n">children</span><span class="o">.</span><span class="n">nil?</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="nf">str_size</span>
+</span><span class='line'>      <span class="k">if</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+</span><span class='line'>        <span class="s2">&quot;%0.0f GB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">))</span>
+</span><span class='line'>      <span class="k">elsif</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
+</span><span class='line'>        <span class="s2">&quot;%0.0f MB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="p">))</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>        <span class="s2">&quot;%0.0f KB&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="mi">1024</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">end</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Files are displayed to uses using a tutorial on <a href="http://homework.nwsnet.de/releases/ea21/">collapse tree for file structures</a>. A simple helper function converts the data structure to the proper nested list explained in this example.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Beginning the Project]]></title>
+    <link href="http://jwils.me/blog/2012/11/02/beginning-the-project/"/>
+    <updated>2012-11-02T15:12:00-07:00</updated>
+    <id>http://jwils.me/blog/2012/11/02/beginning-the-project</id>
+    <content type="html"><![CDATA[<p>Many great web frameworks exist; for this project I chose Ruby on Rails. Since the framework is so popular, gems (extensions) exist that will greatly simplify much of the process. Rails also has a great support community available to help when I run into trouble.</p>
+
+<!--more-->
+
+
+<p>A few examples of great gems are:
+devise cancan, and rolify - Together these gems provide a very powerful and robust way of managing users and permissions. The app has three permission levels researchers, researcher assistants, and admins. Each of these groups will have certain rights and retrictions which are easily managed through these gems.</p>
+
+<p>fog - used to interact with amazon web services through ruby code. Fog can manage amazon instances and files though simple ruby functions.</p>
+
+<p>twitter-bootstrap-rails and simple-form-for - automatically makes forms with bootstrap components, greatly improving design with minimal additional coding.</p>
+
+<h2>Personal Goals</h2>
+
+<p>Setting personal goals outside the simple scope of the project is important to me. I am still learning, and a good way to keep learning is to focus on things that I need to improve while working on a project.</p>
+
+<p>I have a few goals for this project, but most importantly I want to focus on testing. Testing is extremely useful, both for making sure code does what is expected, and ensuring that code wont be broken in the future.</p>
+
+<p>Unfortunately I often overlook testing though. It is often hard to see the time that it saves since it doesn&#8217;t directly convert to progress on the site. However, it saves a lot of time by catching errors before they are published. It also is often easier to design a function when you can test in as you build.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Storing Analytics Data on AWS]]></title>
+    <link href="http://jwils.me/blog/2012/10/30/storing-analytics-data-on-aws/"/>
+    <updated>2012-10-30T23:44:00-07:00</updated>
+    <id>http://jwils.me/blog/2012/10/30/storing-analytics-data-on-aws</id>
+    <content type="html"><![CDATA[<p>Recently The Wharton Customer Analytics Initiative began looking into ways to store research projects online.  I did some research for them to determine the options for using AWS versus in-house solutions. In the end we decided to use EBS backed instances on AWS because of the reasonable price and flexibility that it offers. Here’s a little information on how we arrived at our decision.</p>
+
+<!--more-->
+
+
+<h2>Background</h2>
+
+<p><a href="http://www.wharton.upenn.edu/wcai/%20WCAI">WCAI</a> (The Wharton Customer Analytics Initiative) is &#8220;The world&#8217;s preeminent academic research center focusing on the development and application of customer analytics methods.&#8221; Every few months WCAI receives a dataset from a corporate partner (ranging from ticket sales on StubHub to email marking data from Charming Shoppes). After receiving the data, WCAI does some queries and a basic analysis of the data before sending the data to top researchers across the country. Throughout the research process WCAI supports the researchers by providing access to the data as well as performing any additional queries they may need.</p>
+
+<p>Currently there is no standardized way to store the data for the life of the project. The raw files are submitted and stored on box.com, but for analysis they must be loaded into a database. Some projects are loaded into a MySQL or Postgres database on Wimi-Cruncher (the in-house server), others are stored locally on researchers&#8217; computers in a database program like Microsoft Access. Our goal is to create a uniform long-term storage solution for new projects.</p>
+
+<h2>Proposal</h2>
+
+<p>The wimi-crucher server is outdated, so in the process of looking at ways to replaces the server I was asked to estimate the cost of running future projects on Amazon Web Services. Here&#8217;s a quick table of the per project estimated costs on Amazon.</p>
+
+<table border="1" style="margin-left: .1pt; border-collapse: collapse;">
+    <tr>
+        <td><strong>Service</strong></td>
+        <td><strong>Use</strong></td>
+        <td><strong>Price per Unit</strong></td>
+        <td><strong>Unit Usage</strong></td>
+        <td><strong>Estimated Monthly Cost</strong></td>
+    </tr>
+    <tr>
+        <td>S3</td>
+        <td>Storing raw files</td>
+        <td>$0.125 per GB month</td>
+        <td>40 GB</td>
+        <td>$5</td>
+    </tr>
+    <tr>
+        <td>EC2 Machine (High-Memory Double Extra Large Instances)</td>
+        <td>Perform SQL queries</td>
+        <td>$0.9 per Hour</td>
+        <td>20 Hours per week</td>
+        <td>$72</td>
+    </tr>
+    <tr>
+        <td>EC2 Storage</td>
+        <td>Storing computer hard drive</td>
+        <td>$0.10 per GB Month</td>
+        <td>40 GB</td>
+        <td>$4</td>
+    </tr>
+    <tr>
+        <td>Data out</td>
+        <td>Downloading Data</td>
+        <td>$0.125 per GB</td>
+        <td>100 GB</td>
+        <td>$12.50</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><strong>TOTAL</strong></td>
+        <td><strong>$93.50</strong></td>
+    </tr>
+</table>
+
+
+<p>AWS also offers great additional features such as image backup, the ability to change instance sizes as needed, and Glacier, a cheap long-term data storage solution.</p>
+
+<p>Notice that we can also only pay for the server hours we need. Since server usage is charged by the hour, we only have to pay for the hours we have an instance up to perform queries.</p>
+
+<p>Compared to the cost of purchasing a server or buying a virtual machine though Penn, this was by far the cheapest and most flexible choice, so we made the decision to set it up for the next project.</p>
+
+<h2>Implementation</h2>
+
+<p>While AWS has done a fantastic job at providing many simple and intuitive ways to control instances, we want to be able to provide a straightforward method for a researcher to spin up a project instance and perform queries without having to understand too much of the underlying infrastructure. I have been assigned the task of creating an app to perform this functionality, and will describe the implementation choices I made in future posts.</p>
+]]></content>
+  </entry>
+  
+</feed>

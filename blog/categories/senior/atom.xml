@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Senior | Josh Wilson]]></title>
+  <link href="http://jwils.me/blog/categories/senior/atom.xml" rel="self"/>
+  <link href="http://jwils.me/"/>
+  <updated>2015-07-17T12:53:18-07:00</updated>
+  <id>http://jwils.me/</id>
+  <author>
+    <name><![CDATA[Josh Wilson]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Senior Thesis]]></title>
+    <link href="http://jwils.me/blog/2013/02/03/senior-design/"/>
+    <updated>2013-02-03T04:50:00-08:00</updated>
+    <id>http://jwils.me/blog/2013/02/03/senior-design</id>
+    <content type="html"><![CDATA[<p>For our senior thesis, my team is working determining the readability of colored text. My job has been to create the web app that is used to store our images, collect results from users, and organize the results so that they can be analyzed by our tools written in MATLAB, and later by Weka (a machine learning tool).</p>
+
+<p>The webapp is written in Rails and is integrated in many components of our workflow.</p>
+
+<!--more-->
+
+
+<h2>The workflow:</h2>
+
+<ul>
+<li><p>Jordan generates images using the python Image class. These images are generated uniformly at random across the RGB color space (Defines a color by the amount of red, green and blue).</p></li>
+<li><p>I take the image and upload them to our web app. Our database stores the images, as well as the corresponding foreground and background colors.</p></li>
+<li><p>I then divide them into groups of 8 images and create an experiment. An experiment contains 8 images and three signpost images. I will attempt to discuss the sign posts in more detail in a future post, but they are used to help calibrate our results across experiments.</p></li>
+<li><p>Using the gem Turkee, I can launch these experiments in groups to Mechanical Turk. We pay users get 3-5 cents for each survey they complete.</p></li>
+<li><p>As results come in, we download these results, and generate a CSV file of all comparisons. Ayaka feeds these comparisons into a MATLAB implementation of an model called MLSD. This converts our binary comparisons to a linear scale where each image is given a single value representing its location on a line. I will try to go into more detail on this in a future post.</p></li>
+<li><p>We can then feed these values back into the database, giving us a single value for each image. From here we generate an Attribute-Relation File (ARFF) that we can feed into Weka. Our goal here is to generate a model that can accurately predict the readability value we previously assigned.</p></li>
+</ul>
+
+
+<p>It has taken a while to get all our pipeline components working the way we want, but now that everything is well tested we should begin launching a large number of experiments in the near future and have results soon after that.</p>
+]]></content>
+  </entry>
+  
+</feed>
